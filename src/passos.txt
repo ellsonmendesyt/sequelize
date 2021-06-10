@@ -1,0 +1,184 @@
+1 ) INSTALAR AS DEPENDENCIAS
+
+sequelize-cli sequelize sqlite3 express cors  nodemon
+
+
+
+
+2 ) INICIA O SEQUELIZE 
+sequelize init   (vai criar as pastas )
+
+
+
+
+3 ) criar o arquivo de conexão
+
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('meubanco', 'root', '', {host:'localhost', dialect:'sqlite'});
+module.exports=sequelize;
+global.sequelize=sequelize;
+
+
+
+4 ) CRIA OS DOIS MODELS
+
+------------------------
+const Sequelize = require('sequelize');
+module.exports=sequelize.define(
+    'Usuario',{
+
+   id:{
+    type:Sequelize.INTEGER(11),
+    allowNull:false,
+    autoIncrement:true,
+    primaryKey:true,
+   },
+   nome:{
+       type:Sequelize.STRING,
+       allowNull:false,
+   },
+   email:{
+    type:Sequelize.STRING,
+    allowNull:false,
+},
+senha:{
+    type:Sequelize.STRING,
+    allowNull:false,
+}
+});
+-----------------------
+const Sequelize = require('sequelize');
+module.exports=sequelize.define(
+    'Email',{
+
+   id:{
+    type:Sequelize.INTEGER(11),
+    allowNull:false,
+    autoIncrement:true,
+    primaryKey:true,
+   },
+   remetente:{
+       type:Sequelize.STRING,
+       allowNull:false,
+   },
+   destinatario:{
+    type:Sequelize.STRING,
+    allowNull:false,
+},
+mensagem:{
+    type:Sequelize.TEXT,
+    allowNull:false,
+}
+});
+-----------------------
+
+
+5) CRIA AS MIGRAÇOES QUE IRAO CRIAR AS DUAS TABELAS
+sequelize migration:create --name create_usuarios_table
+
+COPIA OS CAMPOS DO MODEL PARA O SCHEMA DA MIGRATION
+
+6) RODA A MIGRATION 
+sequelize db:migrate
+
+
+  
+7) IMPORTAR OS MODELS E USAR
+
+
+    const Usuarios= require('../models/Usuario');
+    const Emails = require('../models/Email');
+
+
+
+
+8 ) CRIA AS ROTAS PARA INTERAGIR COM A API
+
+
+app.post('/usuarios', async(req,res)=>{
+    const {nome,email, senha}= req.body;
+    
+    try{
+        
+        const usuario =  await Usuario.create({nome,email,senha});
+        return res.status(200).json(usuario);
+    }catch(erro){
+      console.log(erro);
+      return res.status(500).json({erro:'erro ao criar'});
+    }
+    
+})
+
+
+
+app.get('/usuarios', async (req,res)=>{
+    try{
+
+        const usuarios= await Usuario.findAll();
+        return res.status(200).json(usuarios)
+    }catch(erro){
+        console.error(erro);
+        return res.status(500).json({erro:'algo deu errado'});
+    }
+})
+
+
+8.1)  CRIAR DIRETAMENTE
+  Usuario.create({nome:'elson', email:'elsonmendesoficial@gmail.com', senha:'1234567})
+
+const email = await Email.create({remetente:'elsonmendesoficial@gmail.com',destinatario:'cristinamendes2020@gmail.com', mensagem:'Este é meu primeiro email'})
+
+
+
+
+
+
+ROTAS NO INSOMNIA
+
+
+CRIAR USUARIO 
+localhost:3001/usuarios
+{
+	"nome":"elson",
+	"email":"meuoutroemail@gmai.com",
+	"senha":"fafafa"
+}
+
+MANDAR EMAIL 
+localhost:3001/email
+
+{
+	"remetente":"elson",
+	"destinatario":"elsonmendesoficial@gmail.com",
+	"mensagem":"Este é o email teste do elson",
+	"usuarioId":1
+}
+
+LISTAR Usuarios
+localhost:3001/usuarios
+
+
+OBTER EMAIS DE UM USUARIO
+localhost:3001/usuario/1
+
+
+PEGAR EMIAL E SEU DONO
+localhost:3001/email/1
+
+LISTAR EMAISL 
+localhost:3001/emails
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
